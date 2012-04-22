@@ -1,0 +1,12 @@
+# coding: utf8
+#TODO Sorting methods
+@service.run
+def comments():
+    article = request.args[1] or 1
+    cmtdb = db(db.comments.article == article).select()
+    
+    for r in cmtdb:
+        comments.append({'id':r.id, 'author':r.author, 'created_on':r.created_on, 'body':r.body, 'parent_node':r.parent_node, 'children':[]})
+
+
+    return dict(comments=comments)

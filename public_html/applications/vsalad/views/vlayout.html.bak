@@ -1,0 +1,36 @@
+<html lang="en">
+<head>
+    <script src="{{=URL('static','js/jquery.js')}}"></script>
+    <script src="{{=URL('static','js/vsalad.js')}}"></script>
+    <link rel="stylesheet" href="{{=URL('static','css/vs.css')}}"></link>
+    <meta charset="utf-8">
+    <title>Voodoo Salad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Styles -->
+    <link href="{{=URL('static','css/bootstrap.css')}}" rel="stylesheet">
+    <link href="{{=URL('static','css/bootstrap-responsive.css')}}" rel="stylesheet">
+
+  
+</head>
+<body>
+<div id="welcome-panel" class="hero-unit row">
+            
+
+<a href="{{=URL('default', 'index')}}">
+        <div id="title">
+         
+                <h1 class="voodoo span">V&#3232;&#3232;doo {</h1> 
+                <a class="span"><img src="{{=URL('static', 'images/vfish.jpg')}}"/></a>
+                 <h1 class="tuna span">} Tuna</h1>
+                 
+       </div>
+       </a>
+    </div>
+
+
+{{include}}
+</body>
+</html>

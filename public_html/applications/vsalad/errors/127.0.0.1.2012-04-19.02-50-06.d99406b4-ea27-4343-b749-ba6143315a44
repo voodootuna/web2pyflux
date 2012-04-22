@@ -1,0 +1,21 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.ValueError'> need more than 1 value to unpack"
+p3
+sS'layer'
+p4
+S'/home/fish/Desktop/web2py/applications/vsalad/controllers/default.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\n# this file is released under public domain and you can use without limitations\n\n#########################################################################\n## This is a samples controller\n## - index is the default action of any application\n## - user is required for authentication and authorization\n## - download is for downloading files uploaded in the db (does streaming)\n## - call exposes all registered services (none by default)\n#########################################################################\n\ndef index():\n    rows=db().select(db.article.ALL)\n    return dict(articles=rows)\n\ndef user():\n    """\n    exposes:\n    http://..../[app]/default/user/login\n    http://..../[app]/default/user/logout\n    http://..../[app]/default/user/register\n    http://..../[app]/default/user/profile\n    http://..../[app]/default/user/retrieve_password\n    http://..../[app]/default/user/change_password\n    use @auth.requires_login()\n        @auth.requires_membership(\'group name\')\n        @auth.requires_permission(\'read\',\'table name\',record_id)\n    to decorate functions that need access control\n    """\n    return dict(form=auth())\n\n\ndef download():\n    """\n    allows downloading of uploaded files\n    http://..../[app]/default/download/[filename]\n    """\n    return response.download(request,db)\n\n\ndef call():\n    """\n    exposes services. for example:\n    http://..../[app]/default/call/jsonrpc\n    decorate with @services.jsonrpc the functions to expose\n    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv\n    """\n    return service()\n\n\n@auth.requires_signature()\ndef data():\n    """\n    http://..../[app]/default/data/tables\n    http://..../[app]/default/data/create/[table]\n    http://..../[app]/default/data/read/[table]/[id]\n    http://..../[app]/default/data/update/[table]/[id]\n    http://..../[app]/default/data/delete/[table]/[id]\n    http://..../[app]/default/data/select/[table]\n    http://..../[app]/default/data/search/[table]\n    but URLs must be signed, i.e. linked with\n      A(\'table\',_href=URL(\'data/tables\',user_signature=True))\n    or with the signed load operator\n      LOAD(\'default\',\'data.load\',args=\'tables\',ajax=True,user_signature=True)\n    """\n    return dict(form=crud())\n\ndef article():\n    if request.args(0):\n        t = db(db.article.id==request.args(0)).select(db.article.title, db.article.content).first()\n        return dict(title=t.title, content=t.content)\n    else:\n        return "Error : No article selected"\n        \ndef create():\n    form=SQLFORM(db.article)\n    form.process()\n    articles = db().select(db.article.ALL)\n    return dict(article=form, allar=articles)\n\nresponse._vars=response._caller(index)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+sS'traceback'
+p10
+S'Traceback (most recent call last):\n  File "/home/fish/Desktop/web2py/gluon/restricted.py", line 205, in restricted\n    exec ccode in environment\n  File "/home/fish/Desktop/web2py/applications/vsalad/controllers/default.py", line 81, in <module>\n  File "/home/fish/Desktop/web2py/gluon/globals.py", line 173, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/fish/Desktop/web2py/applications/vsalad/controllers/default.py", line 13, in index\n    rows=db().select(db.article.ALL)\n  File "/home/fish/Desktop/web2py/gluon/dal.py", line 7578, in select\n    return adapter.select(self.query,fields,attributes)\n  File "/home/fish/Desktop/web2py/gluon/dal.py", line 1315, in select\n    rows = response(sql)\n  File "/home/fish/Desktop/web2py/gluon/dal.py", line 1305, in response\n    self.execute(sql)\n  File "/home/fish/Desktop/web2py/gluon/dal.py", line 1392, in execute\n    return self.log_execute(*a, **b)\n  File "/home/fish/Desktop/web2py/gluon/dal.py", line 1386, in log_execute\n    ret = self.cursor.execute(*a, **b)\n  File "/usr/lib/python2.7/sqlite3/dbapi2.py", line 66, in convert_timestamp\n    datepart, timepart = val.split(" ")\nValueError: need more than 1 value to unpack\n'
+p11
+s.

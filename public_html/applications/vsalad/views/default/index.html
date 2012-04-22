@@ -1,0 +1,31 @@
+{{extend 'vlayout.html'}}
+
+
+
+
+
+<div id="content" class="row">
+
+<div class="" id="listing">
+{{for article in articles:}}
+ <div id="comment" class="">
+    <div id="midcol" class="span">
+      <div id="upvote" class="icon-arrow-up"></div>
+      <div id="score">{{=article.score}}</div>
+       <div id="downvote" class="icon-arrow-down"></div>
+    </div>
+    <a id="thumbnail" class="span">
+       <img src="http://placehold.it/70x70" alt="">
+    </a>
+    <div id="entry">
+      <a id="title" href="{{=URL('action','comments/%s'%article.id)}}">{{=article.title}}</a>
+      <p id="tagline"> submitted
+        <a id="created_on" title="{{=article.created_on}}"></a>
+         by
+        <a href="#" id="author">{{=article.author}}</a>
+      </p>
+    </div>
+   </div>
+    {{pass}}
+</div>
+</div>

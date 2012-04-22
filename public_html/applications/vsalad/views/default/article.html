@@ -1,0 +1,16 @@
+{{extend 'vlayout.html'}}
+<div id="content" class="row">
+{{if request.args(0):}}
+  <div id='article'>
+    <h1>{{=article.title}} </h1>
+    <p id="tagline"> submitted
+        <a id="created_on" title="{{=article.created_on}}"></a>
+         by
+        <a href="#" id="author">{{=article.author}}</a>
+      </p>
+    </div>
+    <div id='user-text'>
+    <p>{{=article.content}}</p>
+    </div>
+{{pass}}
+</div>

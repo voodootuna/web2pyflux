@@ -1,0 +1,215 @@
+(dp1
+S'output'
+p2
+S'Unable to open included view file: /home/fish/Desktop/web2py/applications/vsalad/views/layout.html'
+p3
+sS'layer'
+p4
+S'ParserContainer'
+p5
+sS'code'
+p6
+S'{{extend \'layout.html\'}}\n<script><!--\n    jQuery(document).ready(function(){\n    jQuery("table.sortable tbody tr").mouseover( function() {\n    jQuery(this).addClass("highlight"); }).mouseout( function() { \n    jQuery(this).removeClass("highlight"); });\n    jQuery(\'table.sortable tbody tr:odd\').addClass(\'odd\');\n    jQuery(\'table.sortable tbody tr:even\').addClass(\'even\');\n});\n//--></script>\n\n{{if request.function==\'index\':}}\n<h2>{{=T("Available databases and tables")}}</h2>\n  {{if not databases:}}{{=T("No databases in this application")}}{{pass}}\n  {{for db in sorted(databases):}}\n    {{for table in databases[db].tables:}}\n      {{qry=\'%s.%s.id>0\'%(db,table)}}\n      {{tbl=databases[db][table]}}\n      {{if hasattr(tbl,\'_primarykey\'):}}\n        {{if tbl._primarykey:}}\n            {{firstkey=tbl[tbl._primarykey[0]]}}\n            {{if firstkey.type in [\'string\',\'text\']:}}\n              {{qry=\'%s.%s.%s!=""\'%(db,table,firstkey.name)}}\n            {{else:}}\n              {{qry=\'%s.%s.%s>0\'%(db,table,firstkey.name)}}\n            {{pass}}\n        {{else:}}\n             {{qry=\'\'}}\n             {{pass}}\n      {{pass}}\n      <h3>\n\t{{=A("%s.%s" % (db,table),_href=URL(\'select\',args=[db],vars=dict(query=qry)))}}\n      </h3>\n      [ {{=A(str(T(\'insert new\'))+\' \'+table,_href=URL(\'insert\',args=[db,table]))}} ]\n    <br /><br />\n    {{pass}}\n  {{pass}}\n\n{{elif request.function==\'select\':}}\n  <h2>{{=XML(str(T("database %s select"))%A(request.args[0],_href=URL(\'index\'))) }}\n  </h2>\n   {{if table:}}\n  [ {{=A(str(T(\'insert new %s\'))%table,_href=URL(\'insert\',args=[request.args[0],table]))}} ]<br/><br/>\n    <h3>{{=T("Rows in table")}}</h3><br/>\n   {{else:}}\n    <h3>{{=T("Rows selected")}}</h3><br/>\n   {{pass}}\n   {{=form}}\n   <p>{{=T(\'The "query" is a condition like "db.table1.field1==\\\'value\\\'". Something like "db.table1.field1==db.table2.field2" results in a SQL JOIN.\')}}<br/>\n      {{=T(\'Use (...)&(...) for AND, (...)|(...) for OR, and ~(...)  for NOT to build more complex queries.\')}}<br/>\n      {{=T(\'"update" is an optional expression like "field1=\\\'newvalue\\\'". You cannot update or delete the results of a JOIN\')}}</p>\n    <br/><br/>\n    <h4>{{=nrows}} {{=T("selected")}}</h4>\n    {{if start>0:}}[ {{=A(T(\'previous 100 rows\'),_href=URL(\'select\',args=request.args[0],vars=dict(start=start-100)))}} ]{{pass}}\n    {{if stop<nrows:}}[ {{=A(T(\'next 100 rows\'),_href=URL(\'select\',args=request.args[0],vars=dict(start=start+100)))}} ]{{pass}}    \n    {{if rows:}}\n       <div style="overflow: auto;" width="80%">\n       {{linkto=URL(\'update\',args=request.args[0])}}\n       {{upload=URL(\'download\',args=request.args[0])}}    \n       {{=SQLTABLE(rows,linkto,upload,orderby=True,_class=\'sortable\')}}\n       </div>\n    {{pass}}\n    <br/><br/><h3>{{=T("Import/Export")}}</h3><br/>\n    [ <a href="{{=URL(\'csv\',args=request.args[0],vars=dict(query=query))}}">{{=T("export as csv file")}}</a> ]\n  {{if table:}}\n    {{=FORM(str(T(\'or import from csv file\'))+" ",INPUT(_type=\'file\',_name=\'csvfile\'),INPUT(_type=\'hidden\',_value=table,_name=\'table\'),INPUT(_type=\'submit\',_value=\'import\'))}}\n  {{pass}}\n\n\n{{elif request.function==\'insert\':}}  \n  <h2>{{=T("database")}} {{=A(request.args[0],_href=URL(\'index\'))}}\n    {{if hasattr(table,\'_primarykey\'):}}\n      {{fieldname=table._primarykey[0]}}\n      {{dbname=request.args[0]}}\n      {{tablename=request.args[1]}}\n      {{cond = table[fieldname].type in [\'string\',\'text\'] and \'!=""\' or \'>0\'}}\n      {{=T("table")}} {{=A(tablename,_href=URL(\'select\',args=dbname,vars=dict(query=\'%s.%s.%s%s\'%(dbname,tablename,fieldname,cond))))}}\n    {{else:}}  \n      {{=T("table")}} {{=A(request.args[1],_href=URL(\'select\',args=request.args[0],vars=dict(query=\'%s.%s.id>0\'%tuple(request.args[:2]))))}}\n    {{pass}}\n  </h2>\n  <h3>{{=T("New Record")}}</h3><br/>\n  {{=form}}\n{{elif request.function==\'update\':}}\n  <h2>{{=T("database")}} {{=A(request.args[0],_href=URL(\'index\'))}}\n    {{if hasattr(table,\'_primarykey\'):}}\n      {{fieldname=request.vars.keys()[0]}}\n      {{dbname=request.args[0]}}\n      {{tablename=request.args[1]}}\n      {{cond = table[fieldname].type in [\'string\',\'text\'] and \'!=""\' or \'>0\'}}      \n      {{=T("table")}} {{=A(tablename,_href=URL(\'select\',args=dbname,vars=dict(query=\'%s.%s.%s%s\'%(dbname,tablename,fieldname,cond))))}}\n      {{=T("record")}} {{=A(\'%s=%s\'%request.vars.items()[0],_href=URL(\'update\',args=request.args[:2],vars=request.vars))}}\n    {{else:}}\n      {{=T("table")}} {{=A(request.args[1],_href=URL(\'select\',args=request.args[0],vars=dict(query=\'%s.%s.id>0\'%tuple(request.args[:2]))))}}\n      {{=T("record id")}} {{=A(request.args[2],_href=URL(\'update\',args=request.args[:3]))}}\n    {{pass}}\n  </h2>\n  <h3>{{=T("Edit current record")}}</h3><br/><br/>{{=form}}\n\n{{elif request.function==\'state\':}}\n  <h2>{{=T("Internal State")}}</h2>\n  <h3>{{=T("Current request")}}</h3>\n  {{=BEAUTIFY(request)}}\n  <br/><h3>{{=T("Current response")}}</h3>\n  {{=BEAUTIFY(response)}}\n  <br/><h3>{{=T("Current session")}}</h3>\n  {{=BEAUTIFY(session)}}\n\n\n{{elif request.function == \'ccache\':}}\n<h2>Cache</h2>\n<div class="list">\n\n  <div class="list-header">\n    <h3>Statistics</h3>\n  </div>\n\n  <div class="content">\n    <h4>Overview</h4>\n    <p>Number of entries: <strong>{{=total[\'entries\']}}</strong>\n      {{if total[\'entries\'] > 0:}}\n    </p>\n    <p>\n      Hit Ratio: \n      <strong>{{=total[\'ratio\']}}%</strong> \n      (<strong>{{=total[\'hits\']}}</strong> hits \n      and <strong>{{=total[\'misses\']}}</strong> misses)\n    </p>\n    <p>\n      Size of cache: \n      {{if object_stats:}}\n      <strong>{{=total[\'objects\']}}</strong> items, \n      <strong>{{=total[\'bytes\']}}</strong> bytes \n      {{if total[\'bytes\'] > 524287:}}\n      (<strong>{{="%.0d" % (total[\'bytes\'] / 1048576)}} MB</strong>)\n      {{pass}}\n      {{else:}} <strong>not available</strong> (requires the Python <a href="http://pypi.python.org/pypi/guppy/" target="_blank">guppy</a> library)\n      {{pass}}\n    </p>\n    <p>\n      Cache contains items up to \n      <strong>{{="%02d" % total[\'oldest\'][0]}}</strong> hours \n      <strong>{{="%02d" % total[\'oldest\'][1]}}</strong> minutes \n      <strong>{{="%02d" % total[\'oldest\'][2]}}</strong> seconds old.\n    </p>\n    {{=BUTTON(T(\'Cache Keys\'), _onclick=\'jQuery("#all_keys").toggle();\')}}\n    <div class="hidden" id="all_keys">\n      {{=total[\'keys\']}}\n    </div>\n    <br />\n    {{pass}}\n        \n    <h4>RAM</h4>\n    <p>Number of entries: <strong>{{=ram[\'entries\']}}</strong>\n        {{if ram[\'entries\'] > 0:}}</p>\n    <p>\n      Hit Ratio: \n      <strong>{{=ram[\'ratio\']}}%</strong> \n      (<strong>{{=ram[\'hits\']}}</strong> hits \n      and <strong>{{=ram[\'misses\']}}</strong> misses)\n    </p>\n    <p>\n      Size of cache: \n      {{if object_stats:}}\n      <strong>{{=ram[\'objects\']}}</strong> items, \n      <strong>{{=ram[\'bytes\']}}</strong> bytes \n      {{if ram[\'bytes\'] > 524287:}}\n      (<strong>{{=ram[\'bytes\'] / 1048576}} MB</strong>)\n      {{pass}}\n      {{else:}} <strong>not available</strong> (requires the Python <a href="http://pypi.python.org/pypi/guppy/" target="_blank">guppy</a> library)\n      {{pass}}\n    </p>\n    <p>\n      RAM contains items up to \n      <strong>{{="%02d" % ram[\'oldest\'][0]}}</strong> hours \n      <strong>{{="%02d" % ram[\'oldest\'][1]}}</strong> minutes \n      <strong>{{="%02d" % ram[\'oldest\'][2]}}</strong> seconds old.\n    </p>\n    {{=BUTTON(T(\'RAM Cache Keys\'), _onclick=\'jQuery("#ram_keys").toggle();\')}}\n    <div class="hidden" id="ram_keys">\n      {{=ram[\'keys\']}}\n    </div>\n    <br />\n    {{pass}}\n    \n    <h4>DISK</h4>\n    <p>Number of entries: <strong>{{=disk[\'entries\']}}</strong>\n      {{if disk[\'entries\'] > 0:}}\n    </p>\n    <p>\n      Hit Ratio: \n      <strong>{{=disk[\'ratio\']}}%</strong> \n      (<strong>{{=disk[\'hits\']}}</strong> hits \n      and <strong>{{=disk[\'misses\']}}</strong> misses)\n    </p>\n    <p>\n      Size of cache: \n      {{if object_stats:}}\n      <strong>{{=disk[\'objects\']}}</strong> items, \n      <strong>{{=disk[\'bytes\']}}</strong> bytes \n      {{if disk[\'bytes\'] > 524287:}}\n      (<strong>{{=disk[\'bytes\'] / 1048576}} MB</strong>)\n      {{pass}}\n      {{else:}} <strong>not available</strong> (requires the Python <a href="http://pypi.python.org/pypi/guppy/" target="_blank">guppy</a> library)\n      {{pass}}\n    </p>\n    <p>\n      DISK contains items up to \n      <strong>{{="%02d" % disk[\'oldest\'][0]}}</strong> hours \n      <strong>{{="%02d" % disk[\'oldest\'][1]}}</strong> minutes \n      <strong>{{="%02d" % disk[\'oldest\'][2]}}</strong> seconds old.\n    </p>\n    {{=BUTTON(T(\'Disk Cache Keys\'), _onclick=\'jQuery("#disk_keys").toggle();\')}}\n    <div class="hidden" id="disk_keys">\n      {{=disk[\'keys\']}}\n    </div>\n    <br />\n    {{pass}}\n  </div>\n    \n  <div class="list-header">\n    <h3>Manage Cache</h3>\n  </div>\n  \n  <div class="content">\n    <p>\n      {{=form}}\n    </p>\n  </div>\n</div>\n<div class="clear"></div>\n{{pass}}\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__getslice__'
+p12
+S"<method-wrapper '__getslice__' of exceptions.IOError object>"
+p13
+sS'__str__'
+p14
+S"<method-wrapper '__str__' of exceptions.IOError object>"
+p15
+sS'__reduce__'
+p16
+S'<built-in method __reduce__ of exceptions.IOError object>'
+p17
+sS'__dict__'
+p18
+S'{}'
+p19
+sS'__sizeof__'
+p20
+S'<built-in method __sizeof__ of exceptions.IOError object>'
+p21
+sS'__init__'
+p22
+S"<method-wrapper '__init__' of exceptions.IOError object>"
+p23
+sS'__setattr__'
+p24
+S"<method-wrapper '__setattr__' of exceptions.IOError object>"
+p25
+sS'__reduce_ex__'
+p26
+S'<built-in method __reduce_ex__ of exceptions.IOError object>'
+p27
+sS'__new__'
+p28
+S'<built-in method __new__ of type object>'
+p29
+sS'errno'
+p30
+S'2'
+sS'__format__'
+p31
+S'<built-in method __format__ of exceptions.IOError object>'
+p32
+sS'__class__'
+p33
+S"<type 'exceptions.IOError'>"
+p34
+sS'filename'
+p35
+S"'/home/fish/Desktop/web2py/applications/vsalad/views/layout.html'"
+p36
+sS'__doc__'
+p37
+S"'I/O operation failed.'"
+p38
+sS'__getitem__'
+p39
+S"<method-wrapper '__getitem__' of exceptions.IOError object>"
+p40
+sS'__setstate__'
+p41
+S'<built-in method __setstate__ of exceptions.IOError object>'
+p42
+sS'__getattribute__'
+p43
+S"<method-wrapper '__getattribute__' of exceptions.IOError object>"
+p44
+sS'args'
+p45
+S"(2, 'No such file or directory')"
+p46
+sS'__subclasshook__'
+p47
+S'<built-in method __subclasshook__ of type object>'
+p48
+sS'__unicode__'
+p49
+S'<built-in method __unicode__ of exceptions.IOError object>'
+p50
+sS'strerror'
+p51
+S"'No such file or directory'"
+p52
+sS'__delattr__'
+p53
+S"<method-wrapper '__delattr__' of exceptions.IOError object>"
+p54
+sS'__repr__'
+p55
+S"<method-wrapper '__repr__' of exceptions.IOError object>"
+p56
+sS'__hash__'
+p57
+S"<method-wrapper '__hash__' of exceptions.IOError object>"
+p58
+ssS'evalue'
+p59
+S"[Errno 2] No such file or directory: '/home/fish/Desktop/web2py/applications/vsalad/views/layout.html'"
+p60
+sS'frames'
+p61
+(lp62
+(dp63
+S'file'
+p64
+S'/home/fish/Desktop/web2py/gluon/template.py'
+p65
+sS'dump'
+p66
+(dp67
+S'builtinopen'
+p68
+S'<built-in function open>'
+p69
+sS'fileobj'
+p70
+S'undefined'
+p71
+sS'filepath'
+p72
+S"'/home/fish/Desktop/web2py/applications/vsalad/views/layout.html'"
+p73
+ssS'lnum'
+p74
+I442
+sS'lines'
+p75
+(dp76
+I437
+S'        # Get the path of the file on the system.'
+p77
+sI438
+S'        filepath = os.path.join(self.path, filename)'
+p78
+sI439
+S''
+sI440
+S'        # try to read the text.'
+p79
+sI441
+S'        try:'
+p80
+sI442
+S"            fileobj = open(filepath, 'rb')"
+p81
+sI443
+S'            text = fileobj.read()'
+p82
+sI444
+S'            fileobj.close()'
+p83
+sI445
+S'        except IOError:'
+p84
+sI446
+S"            self._raise_error('Unable to open included view file: ' + filepath)"
+p85
+ssS'call'
+p86
+S"(self=<gluon.template.TemplateParser object>, filename='layout.html')"
+p87
+sS'func'
+p88
+S'_get_file_text'
+p89
+sasS'pyver'
+p90
+S'Python 2.7.2+: /usr/bin/python'
+p91
+sS'etype'
+p92
+S"<type 'exceptions.IOError'>"
+p93
+sS'date'
+p94
+S'Thu Apr 19 04:02:03 2012'
+p95
+sS'locals'
+p96
+(dp97
+S'self'
+p98
+S'<gluon.template.TemplateParser object>'
+p99
+sS'filepath'
+p100
+S"'/home/fish/Desktop/web2py/applications/vsalad/views/layout.html'"
+p101
+sg35
+S"'layout.html'"
+p102
+sssS'traceback'
+p103
+S'Traceback (most recent call last):\n  File "/home/fish/Desktop/web2py/gluon/template.py", line 442, in _get_file_text\n    fileobj = open(filepath, \'rb\')\nIOError: [Errno 2] No such file or directory: \'/home/fish/Desktop/web2py/applications/vsalad/views/layout.html\'\n'
+p104
+s.

@@ -1,0 +1,8 @@
+# coding: utf8
+class Tools(object):
+    def __init__(self)
+        
+    
+    def indexer(self, key, lst):
+        self.p_indexer = dict((p['id'], i) for i, p in enumerate(lst))
+        return self.p_indexer.get(key,-1)

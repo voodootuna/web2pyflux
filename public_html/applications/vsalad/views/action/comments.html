@@ -1,0 +1,87 @@
+{{extend 'vlayout.html'}}
+<div id="content" class="row">
+{{if request.args(0):}}
+  <div id='article'>
+    <h1>{{=article.title}} </h1>
+    <p id="tagline"> submitted
+        <a id="created_on" title="{{=article.created_on}}"></a>
+         by
+        <a href="#" id="author">{{=article.author}}</a>
+      </p>
+    </div>
+    <div id='user-text'>
+    <p>{{=article.content}}</p>
+    </div>
+{{pass}}
+</div>
+
+
+    <style> 
+    
+    body, input, textarea {
+color: #373737;
+font: 13px "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-weight: 300;
+line-height: 1.625;
+}
+
+     
+    .comments .user-text {
+    padding-left :15px;
+    }
+
+    .children {padding-left: 10px;}
+        
+    .tagline {
+    padding: 0;
+    margin: 0;
+    font-size: small;
+    }
+      
+    .tagline a{
+    margin-right: 1px;
+    text-decoration:none;
+    font-size: small;
+    }
+    
+    .author {
+    color: gray;
+    font-weight: bold;
+    }
+    
+    .flatlist {
+    font-size: small;
+    font-weight:bold;
+    color: gray;
+    }
+    </style>
+
+
+{{def show(t, count=0):}}
+{{if count < 4:}}
+    {{for x in t:}}
+        <div class="comment">
+        <p class="tagline">
+            <a class="expand" href="#">[-]</a>
+            <a class="author" href="#">{{=x['author']}}</a>
+            <a class="time" href="#" title="{{=x['created_on']}}">{{=x['created_on']}}</a>      
+            </p>
+          
+        <div class="user-text">{{=x['body']}}</div>
+        <div class="flatlist">
+            <a class="reply">reply</a>
+            </div>
+        <div class="children">
+        {{ if x['children']:}}
+                {{show(x['children'], count+1)}}                
+        {{pass}}
+        </div>  
+        </div>
+    {{pass}}
+ {{ else:}}
+<a href="/{{=t}}">Load more comments</a>
+      {{pass}}
+    {{return}}
+    
+   
+{{show(children)}}
