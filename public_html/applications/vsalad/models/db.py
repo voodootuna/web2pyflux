@@ -13,11 +13,8 @@ if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
     #
     #db = DAL('sqlite://storage.sqlite')
-<<<<<<< HEAD
     db = DAL('mysql://voodootuna:27CBWgI6YG@voodootuna.mysql.fluxflex.com:3306/voodootuna')
-=======
-    db = DAL('mysql://voodootuna:27CBWgI6YG@voodootuna.mysql.fluxflex.com:3306/voodootuna', migrate=False, fake_migrate=True)
->>>>>>> e36e30ef8cee2cdf0189b61fd76c0ff1b8f3cf2f
+
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     db = DAL('google:datastore/')
