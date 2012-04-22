@@ -46,7 +46,6 @@ from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db, hmac_key=Auth.get_or_create_key())
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
-auth.settings.table_user_name = 'person' 
 
 db.define_table(
     auth.settings.table_user_name,
